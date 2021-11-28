@@ -17,7 +17,7 @@ def extract_features(directory):
 	# re-structure the model
 	model = Model(inputs=model.inputs, outputs=model.layers[-2].output)
 	# summarize
-	print(model.summary())
+	# print(model.summary())
 	# extract features from each photo
 	features = dict()
 	for name in listdir(directory):
@@ -110,13 +110,13 @@ def save_descriptions(descriptions, filename):
 	file.close()
  
 # extract features from all images
-directory = 'Flickr8k_Dataset'
+directory = '../data/Flicker8k_Dataset'
 features = extract_features(directory)
 print('Extracted Features: %d' % len(features))
 # save to file
 dump(features, open('features.pkl', 'wb'))
 
-filename = 'Flickr8k_text/Flickr8k.token.txt'
+filename = '../data/Flickr8k_text/Flickr8k.token.txt'
 # load descriptions
 doc = load_doc(filename)
 # parse descriptions
