@@ -1,1 +1,1 @@
-# Generating-Image-Descriptions
+# Generating Image Descriptions
