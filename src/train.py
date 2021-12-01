@@ -169,7 +169,7 @@ print('Description Length: %d' % max_length)
 # define the model
 model = define_model(vocab_size, max_length)
 # train the model, run epochs manually and save after each epoch
-epochs = 20
+epochs = 1
 steps = len(train_descriptions)
 for i in range(epochs):
 	# create the data generator
