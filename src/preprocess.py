@@ -1,21 +1,19 @@
-import tensorflow
-import keras
+import tensorflow as tf
+
 
 from os import listdir
 from pickle import dump
-from keras.applications.vgg16 import VGG16
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
 from keras.applications.vgg16 import preprocess_input
-from keras.models import Model
 import string
  
 # extract features from each photo in the directory
-def extract_features(directory):
+def extract_photo_features(directory): #this needs to stay 
 	# load the model
-	model = VGG16()
+	model = tf.keras.applications.vgg16.VGG16()
 	# re-structure the model
-	model = Model(inputs=model.inputs, outputs=model.layers[-2].output)
+	model = tf.keras.Model(inputs=model.inputs, outputs=model.layers[-2].output)
 	# summarize
 	# print(model.summary())
 	# extract features from each photo
@@ -50,7 +48,7 @@ def load_doc(filename):
 	return text
  
 # extract descriptions for images
-def load_descriptions(doc):
+def load_descriptions(doc): 
 	mapping = dict()
 	# process lines
 	for line in doc.split('\n'):
@@ -109,23 +107,3 @@ def save_descriptions(descriptions, filename):
 	file.write(data)
 	file.close()
  
-# extract features from all images
-directory = '../data/Flicker8k_Dataset'
-features = extract_features(directory)
-print('Extracted Features: %d' % len(features))
-# save to file
-dump(features, open('features.pkl', 'wb'))
-
-filename = '../data/Flickr8k_text/Flickr8k.token.txt'
-# load descriptions
-doc = load_doc(filename)
-# parse descriptions
-descriptions = load_descriptions(doc)
-print('Loaded: %d ' % len(descriptions))
-# clean descriptions
-clean_descriptions(descriptions)
-# summarize vocabulary
-vocabulary = to_vocabulary(descriptions)
-print('Vocabulary Size: %d' % len(vocabulary))
-# save to file
-save_descriptions(descriptions, 'descriptions.txt')

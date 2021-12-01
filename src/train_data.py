@@ -4,6 +4,7 @@ from tensorflow.python.keras.preprocessing.text import Tokenizer
 from tensorflow.python.keras.preprocessing.sequence import pad_sequences
 from tensorflow.python.keras.utils.np_utils import to_categorical
 from array import array
+
 # load doc into memory
 def load_doc(filename):
 	# open the file as read only
@@ -14,7 +15,7 @@ def load_doc(filename):
 	file.close()
 	return text
 
-# load a pre-defined list of photo identifiers
+# load a pre-defined list of photo identifiers 
 def load_set(filename):
 	doc = load_doc(filename)
 	dataset = list()
@@ -103,18 +104,3 @@ def max_length(descriptions):
 	lines = to_lines(descriptions)
 	return max(len(d.split()) for d in lines)
 
-# load training dataset (6K)
-filename = 'data/Flickr8k_text/Flickr_8k.trainImages.txt'
-train = load_set(filename)
-print('Dataset: %d' % len(train))
-# descriptions
-train_descriptions = load_clean_descriptions('src/descriptions.txt', train)
-print('Descriptions: train=%d' % len(train_descriptions))
-# photo features
-train_features = load_photo_features('src/features.pkl', train)
-print('Photos: train=%d' % len(train_features))
-
-# prepare tokenizer
-tokenizer = create_tokenizer(train_descriptions)
-vocab_size = len(tokenizer.word_index) + 1
-print('Vocabulary Size: %d' % vocab_size)
