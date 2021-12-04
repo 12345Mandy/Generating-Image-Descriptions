@@ -1,9 +1,13 @@
 import tensorflow
 import keras
 
+from train import define_model
+from train import train
+
 from os import listdir
 from pickle import dump
-from keras.applications.vgg16 import VGG16
+from vgg import VGG16
+
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
 from keras.applications.vgg16 import preprocess_input
@@ -54,3 +58,10 @@ print('Photos: train=%d' % len(train_features))
 tokenizer = create_tokenizer(train_descriptions)
 vocab_size = len(tokenizer.word_index) + 1
 print('Vocabulary Size: %d' % vocab_size)
+
+max_length = max_length(train_descriptions)
+print('Description Length: %d' % max_length)
+model = define_model(vocab_size, max_length) # define the model
+
+# train
+train(model, train_descriptions, train_features, tokenizer, vocab_size)
