@@ -6,7 +6,7 @@ from train import train
 
 from os import listdir
 from pickle import dump
-from vgg import VGG16
+from keras.applications.vgg16 import VGG16
 
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
@@ -24,7 +24,7 @@ from train_data import *
 
 # extract features from all images
 directory = '../data/Flicker8k_Dataset'
-features = extract_features(directory)
+features = extract_photo_features(directory)
 print('Extracted Features: %d' % len(features))
 # save to file
 dump(features, open('features.pkl', 'wb')) #this creates features file

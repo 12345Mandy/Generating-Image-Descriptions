@@ -2,7 +2,7 @@
 
 ## Starting Out
 
-You should run commands in the root of the project directory.
+You should run commands in the src folder of the project directory.
 
 ## Works Cited
 

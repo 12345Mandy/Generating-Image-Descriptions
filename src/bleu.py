@@ -132,11 +132,11 @@ def evaluate_model(model, descriptions, photos, tokenizer, max_length):
 # prepare tokenizer on train set
  
 # load training dataset (6K)
-filename = 'data/Flickr8k_text/Flickr_8k.trainImages.txt'
+filename = '../data/Flickr8k_text/Flickr_8k.trainImages.txt'
 train = load_set(filename)
 print('Dataset: %d' % len(train))
 # descriptions
-train_descriptions = load_clean_descriptions('src/descriptions.txt', train)
+train_descriptions = load_clean_descriptions('descriptions.txt', train)
 print('Descriptions: train=%d' % len(train_descriptions))
 # prepare tokenizer
 tokenizer = create_tokenizer(train_descriptions)
@@ -149,18 +149,18 @@ print('Description Length: %d' % max_length)
 # prepare test set
  
 # load test set
-filename = 'data/Flickr8k_text/Flickr_8k.testImages.txt'
+filename = '../data/Flickr8k_text/Flickr_8k.testImages.txt'
 test = load_set(filename)
 print('Dataset: %d' % len(test))
 # descriptions
-test_descriptions = load_clean_descriptions('src/descriptions.txt', test)
+test_descriptions = load_clean_descriptions('descriptions.txt', test)
 print('Descriptions: test=%d' % len(test_descriptions))
 # photo features
-test_features = load_photo_features('src/features.pkl', test)
+test_features = load_photo_features('features.pkl', test)
 print('Photos: test=%d' % len(test_features))
  
 # load the model
-filename = 'model_0.h5'
+filename = '../model_0.h5'
 model = load_model(filename)
 # evaluate model
 evaluate_model(model, test_descriptions, test_features, tokenizer, max_length)

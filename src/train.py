@@ -149,32 +149,28 @@ def data_generator(descriptions, photos, tokenizer, max_length, vocab_size):
 			yield [in_img, in_seq], out_word
  
 # load training dataset (6K)
-filename = 'data/Flickr8k_text/Flickr_8k.trainImages.txt'
-train = load_set(filename)
-print('Dataset: %d' % len(train))
+# filename = 'data/Flickr8k_text/Flickr_8k.trainImages.txt'
+# train = load_set(filename)
+# print('Dataset: %d' % len(train))
 # descriptions
-train_descriptions = load_clean_descriptions('src/descriptions.txt', train)
-print('Descriptions: train=%d' % len(train_descriptions))
+# train_descriptions = load_clean_descriptions('src/descriptions.txt', train)
+# print('Descriptions: train=%d' % len(train_descriptions))
 # photo features
-train_features = load_photo_features('src/features.pkl', train)
-print('Photos: train=%d' % len(train_features))
+# train_features = load_photo_features('src/features.pkl', train)
+# print('Photos: train=%d' % len(train_features))
 # prepare tokenizer
-tokenizer = create_tokenizer(train_descriptions)
-vocab_size = len(tokenizer.word_index) + 1
-print('Vocabulary Size: %d' % vocab_size)
+# tokenizer = create_tokenizer(train_descriptions)
+# vocab_size = len(tokenizer.word_index) + 1
+# print('Vocabulary Size: %d' % vocab_size)
 # determine the maximum sequence length
-max_length = max_length(train_descriptions)
-print('Description Length: %d' % max_length)
- 
-# define the model
-model = define_model(vocab_size, max_length)
-# train the model, run epochs manually and save after each epoch
-epochs = 1
-steps = len(train_descriptions)
-for i in range(epochs):
-	# create the data generator
-	generator = data_generator(train_descriptions, train_features, tokenizer, max_length, vocab_size)
-	# fit for one epoch
-	model.fit_generator(generator, epochs=1, steps_per_epoch=steps, verbose=1)
-	# save model
-	model.save('model_' + str(i) + '.h5')
+
+def train(model, train_descriptions, train_features, tokenizer, vocab_size):
+	steps = len(train_descriptions) # train the model, run epochs manually and save after each epoch
+	epochs = 1
+	for i in range(epochs):
+		# create the data generator
+		generator = data_generator(train_descriptions, train_features, tokenizer, max_length, vocab_size)
+		# fit for one epoch
+		model.fit_generator(generator, epochs=1, steps_per_epoch=steps, verbose=1)
+		# save model
+		model.save('model_' + str(i) + '.h5')
