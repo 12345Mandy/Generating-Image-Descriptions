@@ -1,4 +1,3 @@
-
 import numpy as np
 from numpy import array
 from pickle import load
@@ -8,24 +7,11 @@ from tensorflow.python.keras.engine.input_layer import Input
 from tensorflow.python.keras.models import Model
 from keras_preprocessing.text import Tokenizer
 from tensorflow.python.keras.utils.np_utils import to_categorical
-from tensorflow.python.keras.utils.vis_utils import plot_model
-# from keras.preprocessing.text import Tokenizer
-# from keras.preprocessing.sequence import pad_sequences
-# from keras.utils import to_categorical
-# from keras.utils import plot_model
-# from keras.models import Model
-# from keras.layers import Input
-# from keras.layers import Dense
-# from keras.layers import LSTM
-# from keras.layers import Embedding
-# from keras.layers import Dropout
-# from keras.layers.merge import add
-# from keras.callbacks import ModelCheckpoint
+# from tensorflow.python.keras.utils.vis_utils import plot_model
 from nltk.translate.bleu_score import corpus_bleu 
-from tensorflow.keras.models import load_model
+# from tensorflow.keras.models import load_model
 from utils import *
- 
- 
+
 # load clean descriptions into memory
 def load_clean_descriptions(filename, dataset):
 	# load document
@@ -129,8 +115,6 @@ def data_generator(descriptions, photos, tokenizer, max_length, vocab_size):
 			in_img, in_seq, out_word = create_sequences(tokenizer, max_length, desc_list, photo, vocab_size)
 			yield [in_img, in_seq], out_word
  
-
-
 def train(model, train_descriptions, train_features, tokenizer, vocab_size): #maybe add batching?
 	steps = len(train_descriptions) # train the model, run epochs manually and save after each epoch
 	epochs = 1
@@ -176,7 +160,7 @@ def generate_desc(model, tokenizer, photo, max_length):
 	return in_text
  
 # evaluate the skill of the model
-#test
+# test
 def evaluate_model(model, descriptions, photos, tokenizer, max_length):
 	actual, predicted = list(), list()
 	# step over the whole set
@@ -192,19 +176,3 @@ def evaluate_model(model, descriptions, photos, tokenizer, max_length):
 	print('BLEU-2: %f' % corpus_bleu(actual, predicted, weights=(0.5, 0.5, 0, 0)))
 	print('BLEU-3: %f' % corpus_bleu(actual, predicted, weights=(0.3, 0.3, 0.3, 0)))
 	print('BLEU-4: %f' % corpus_bleu(actual, predicted, weights=(0.25, 0.25, 0.25, 0.25)))
-
-		# load training dataset (6K)
-# filename = 'data/Flickr8k_text/Flickr_8k.trainImages.txt'
-# train = load_set(filename)
-# print('Dataset: %d' % len(train))
-# descriptions
-# train_descriptions = load_clean_descriptions('src/descriptions.txt', train)
-# print('Descriptions: train=%d' % len(train_descriptions))
-# photo features
-# train_features = load_photo_features('src/features.pkl', train)
-# print('Photos: train=%d' % len(train_features))
-# prepare tokenizer
-# tokenizer = create_tokenizer(train_descriptions)
-# vocab_size = len(tokenizer.word_index) + 1
-# print('Vocabulary Size: %d' % vocab_size)
-# determine the maximum sequence length

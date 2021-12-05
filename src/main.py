@@ -1,23 +1,17 @@
-import tensorflow
-import keras
-
-from train import define_model
-from train import train
-
-from os import listdir
-from pickle import dump
-from keras.applications.vgg16 import VGG16
-
-from keras.preprocessing.image import load_img
-from keras.preprocessing.image import img_to_array
-from keras.applications.vgg16 import preprocess_input
-from keras.models import Model
-import string
-from pickle import load
-from tensorflow.python.keras.preprocessing.text import Tokenizer
-from tensorflow.python.keras.preprocessing.sequence import pad_sequences
-from tensorflow.python.keras.utils.np_utils import to_categorical
-from array import array
+# import tensorflow
+# import keras
+# from os import listdir
+from pickle import dump#, load
+# from keras.applications.vgg16 import VGG16
+# from keras.preprocessing.image import load_img
+# from keras.preprocessing.image import img_to_array
+# from keras.applications.vgg16 import preprocess_input
+# from keras.models import Model
+# import string
+# from tensorflow.python.keras.preprocessing.text import Tokenizer
+# from tensorflow.python.keras.preprocessing.sequence import pad_sequences
+# from tensorflow.python.keras.utils.np_utils import to_categorical
+# from array import array
 
 from preprocess import *
 from train import *

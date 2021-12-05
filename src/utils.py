@@ -11,7 +11,7 @@ def load_doc(filename):
 	return text
 
 def load_set(filename):
-    	doc = load_doc(filename)
+	doc = load_doc(filename)
 	dataset = list()
 	# process line by line
 	for line in doc.split('\n'):

@@ -1,6 +1,4 @@
 import tensorflow as tf
-
-
 from os import listdir
 from pickle import dump
 from keras.preprocessing.image import load_img
@@ -14,8 +12,6 @@ def extract_photo_features(directory): #this needs to stay
 	model = tf.keras.applications.vgg16.VGG16()
 	# re-structure the model
 	model = tf.keras.Model(inputs=model.inputs, outputs=model.layers[-2].output)
-	# summarize
-	# print(model.summary())
 	# extract features from each photo
 	features = dict()
 	for name in listdir(directory):
@@ -36,8 +32,6 @@ def extract_photo_features(directory): #this needs to stay
 		features[image_id] = feature
 		print('>%s' % name)
 	return features
-
-
  
 # extract descriptions for images
 def load_descriptions(doc): 
@@ -98,4 +92,3 @@ def save_descriptions(descriptions, filename):
 	file = open(filename, 'w')
 	file.write(data)
 	file.close()
- 
