@@ -1,4 +1,5 @@
 
+import numpy as np
 from numpy import array
 from pickle import load
 from tensorflow.python.keras.preprocessing.sequence import pad_sequences
@@ -20,30 +21,10 @@ from tensorflow.python.keras.utils.vis_utils import plot_model
 # from keras.layers import Dropout
 # from keras.layers.merge import add
 # from keras.callbacks import ModelCheckpoint
+from nltk.translate.bleu_score import corpus_bleu 
+from tensorflow.keras.models import load_model
+from utils import *
  
-# load doc into memory
-def load_doc(filename):
-	# open the file as read only
-	file = open(filename, 'r')
-	# read all text
-	text = file.read()
-	# close the file
-	file.close()
-	return text
- 
-# load a pre-defined list of photo identifiers
-def load_set(filename):
-	doc = load_doc(filename)
-	dataset = list()
-	# process line by line
-	for line in doc.split('\n'):
-		# skip empty lines
-		if len(line) < 1:
-			continue
-		# get the image identifier
-		identifier = line.split('.')[0]
-		dataset.append(identifier)
-	return set(dataset)
  
 # load clean descriptions into memory
 def load_clean_descriptions(filename, dataset):
@@ -114,7 +95,7 @@ def create_sequences(tokenizer, max_length, desc_list, photo, vocab_size):
 			y.append(out_seq)
 	return array(X1), array(X2), array(y)
  
-# define the captioning model
+# define the captioning model #change all this to be how we do it 
 def define_model(vocab_size, max_length):
 	# feature extractor model
 	inputs1 = Input(shape=(4096,))
@@ -148,7 +129,71 @@ def data_generator(descriptions, photos, tokenizer, max_length, vocab_size):
 			in_img, in_seq, out_word = create_sequences(tokenizer, max_length, desc_list, photo, vocab_size)
 			yield [in_img, in_seq], out_word
  
-# load training dataset (6K)
+
+
+def train(model, train_descriptions, train_features, tokenizer, vocab_size): #maybe add batching?
+	steps = len(train_descriptions) # train the model, run epochs manually and save after each epoch
+	epochs = 1
+	for i in range(epochs):
+		# create the data generator
+		generator = data_generator(train_descriptions, train_features, tokenizer, max_length, vocab_size)
+		# fit for one epoch
+		model.fit_generator(generator, epochs=1, steps_per_epoch=steps, verbose=1)
+		# save model
+		model.save('model_' + str(i) + '.h5')
+
+# map an integer to a word
+def word_for_id(integer, tokenizer):
+	for word, index in tokenizer.word_index.items():
+		if index == integer:
+			return word
+	return None
+ 
+# generate a description for an image
+def generate_desc(model, tokenizer, photo, max_length):
+	# seed the generation process
+	in_text = 'startseq'
+	# iterate over the whole length of the sequence
+	for i in range(max_length):
+		# integer encode input sequence
+		sequence = tokenizer.texts_to_sequences([in_text])[0]
+		# pad input
+		sequence = pad_sequences([sequence], maxlen=max_length)
+		# predict next word
+		yhat = model.predict([photo,sequence], verbose=0)
+		# convert probability to integer
+		yhat = np.argmax(yhat)
+		# map integer to word
+		word = word_for_id(yhat, tokenizer)
+		# stop if we cannot map the word
+		if word is None:
+			break
+		# append as input for generating the next word
+		in_text += ' ' + word
+		# stop if we predict the end of the sequence
+		if word == 'endseq':
+			break
+	return in_text
+ 
+# evaluate the skill of the model
+#test
+def evaluate_model(model, descriptions, photos, tokenizer, max_length):
+	actual, predicted = list(), list()
+	# step over the whole set
+	for key, desc_list in descriptions.items():
+		# generate description
+		yhat = generate_desc(model, tokenizer, photos[key], max_length)
+		# store actual and predicted
+		references = [d.split() for d in desc_list]
+		actual.append(references)
+		predicted.append(yhat.split())
+	# calculate BLEU score
+	print('BLEU-1: %f' % corpus_bleu(actual, predicted, weights=(1.0, 0, 0, 0)))
+	print('BLEU-2: %f' % corpus_bleu(actual, predicted, weights=(0.5, 0.5, 0, 0)))
+	print('BLEU-3: %f' % corpus_bleu(actual, predicted, weights=(0.3, 0.3, 0.3, 0)))
+	print('BLEU-4: %f' % corpus_bleu(actual, predicted, weights=(0.25, 0.25, 0.25, 0.25)))
+
+		# load training dataset (6K)
 # filename = 'data/Flickr8k_text/Flickr_8k.trainImages.txt'
 # train = load_set(filename)
 # print('Dataset: %d' % len(train))
@@ -163,14 +208,3 @@ def data_generator(descriptions, photos, tokenizer, max_length, vocab_size):
 # vocab_size = len(tokenizer.word_index) + 1
 # print('Vocabulary Size: %d' % vocab_size)
 # determine the maximum sequence length
-
-def train(model, train_descriptions, train_features, tokenizer, vocab_size):
-	steps = len(train_descriptions) # train the model, run epochs manually and save after each epoch
-	epochs = 1
-	for i in range(epochs):
-		# create the data generator
-		generator = data_generator(train_descriptions, train_features, tokenizer, max_length, vocab_size)
-		# fit for one epoch
-		model.fit_generator(generator, epochs=1, steps_per_epoch=steps, verbose=1)
-		# save model
-		model.save('model_' + str(i) + '.h5')

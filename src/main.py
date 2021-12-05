@@ -20,7 +20,8 @@ from tensorflow.python.keras.utils.np_utils import to_categorical
 from array import array
 
 from preprocess import *
-from train_data import *
+from train import *
+from utils import *
 
 # extract features from all images
 directory = '../data/Flicker8k_Dataset'
@@ -65,3 +66,20 @@ model = define_model(vocab_size, max_length) # define the model
 
 # train
 train(model, train_descriptions, train_features, tokenizer, vocab_size)
+
+# load test set
+filename = '../data/Flickr8k_text/Flickr_8k.testImages.txt'
+test = load_set(filename)
+print('Dataset: %d' % len(test))
+# descriptions
+test_descriptions = load_clean_descriptions('descriptions.txt', test)
+print('Descriptions: test=%d' % len(test_descriptions))
+# photo features
+test_features = load_photo_features('features.pkl', test)
+print('Photos: test=%d' % len(test_features))
+ 
+# load the model
+filename = '../model_0.h5'
+model = load_model(filename)
+# evaluate model
+evaluate_model(model, test_descriptions, test_features, tokenizer, max_length)
