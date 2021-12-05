@@ -9,7 +9,7 @@ from keras_preprocessing.text import Tokenizer
 from tensorflow.python.keras.utils.np_utils import to_categorical
 # from tensorflow.python.keras.utils.vis_utils import plot_model
 from nltk.translate.bleu_score import corpus_bleu 
-# from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model
 from utils import *
 
 # load clean descriptions into memory

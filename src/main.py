@@ -17,36 +17,18 @@ from preprocess import *
 from train import *
 from utils import *
 
-# extract features from all images
-directory = '../data/Flicker8k_Dataset'
-features = extract_photo_features(directory)
-print('Extracted Features: %d' % len(features))
-# save to file
-dump(features, open('features.pkl', 'wb')) #this creates features file
+# right now main assumes preprocess has been run
 
-file = '../data/Flickr8k_text/Flickr8k.token.txt' #these are like the labels, pregenerated captions
-# load descriptions
-doc = load_doc(file)
-# parse descriptions
-descriptions = load_descriptions(doc)
-print('Loaded: %d ' % len(descriptions))
-# clean descriptions
-clean_descriptions(descriptions)
-# summarize vocabulary
-vocabulary = to_vocabulary(descriptions)
-print('Vocabulary Size: %d' % len(vocabulary))
-# save to file
-save_descriptions(descriptions, 'descriptions.txt') #these are the labels, what we train based off of (modify to remove prepositions and stuff)
 
 # load training dataset (6K)
-filename = 'data/Flickr8k_text/Flickr_8k.trainImages.txt'
+filename = '../data/Flickr8k_text/Flickr_8k.trainImages.txt'
 train = load_set(filename)
 print('Dataset: %d' % len(train))
 # descriptions
-train_descriptions = load_clean_descriptions('src/descriptions.txt', train)
+train_descriptions = load_clean_descriptions('descriptions.txt', train)
 print('Descriptions: train=%d' % len(train_descriptions))
 # photo features
-train_features = load_photo_features('src/features.pkl', train)
+train_features = load_photo_features('features.pkl', train)
 print('Photos: train=%d' % len(train_features))
 
 # prepare tokenizer
