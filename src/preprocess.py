@@ -1,9 +1,9 @@
 import tensorflow as tf
 from os import listdir
 from pickle import dump
-from keras.preprocessing.image import load_img
-from keras.preprocessing.image import img_to_array
-from keras.applications.vgg16 import preprocess_input
+from tensorflow.keras.preprocessing.image import load_img
+from tensorflow.keras.preprocessing.image import img_to_array
+from tensorflow.keras.applications.vgg16 import preprocess_input
 import string
 from utils import load_doc
  

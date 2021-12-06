@@ -13,22 +13,21 @@ from pickle import dump#, load
 # from tensorflow.python.keras.utils.np_utils import to_categorical
 # from array import array
 
-from preprocess import *
+# from preprocess import *
 from train import *
 from utils import *
 
 # right now main assumes preprocess has been run
 
-
 # load training dataset (6K)
 filename = '../data/Flickr8k_text/Flickr_8k.trainImages.txt'
-train = load_set(filename)
-print('Dataset: %d' % len(train))
+train_stuff = load_set(filename)
+print('Dataset: %d' % len(train_stuff))
 # descriptions
-train_descriptions = load_clean_descriptions('descriptions.txt', train)
+train_descriptions = load_clean_descriptions('descriptions.txt', train_stuff)
 print('Descriptions: train=%d' % len(train_descriptions))
 # photo features
-train_features = load_photo_features('features.pkl', train)
+train_features = load_photo_features('features.pkl', train_stuff)
 print('Photos: train=%d' % len(train_features))
 
 # prepare tokenizer
