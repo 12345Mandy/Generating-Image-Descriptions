@@ -72,6 +72,8 @@ def create_sequences(tokenizer, max_length, desc_list, photo, vocab_size):
 			# split into input and output pair
 			in_seq, out_seq = seq[:i], seq[i]
 			# pad input sequence
+			# print(type(in_seq))
+			# print(type(max_length))
 			in_seq = pad_sequences([in_seq], maxlen=max_length)[0]
 			# encode output sequence
 			out_seq = to_categorical([out_seq], num_classes=vocab_size)[0]
@@ -115,7 +117,7 @@ def data_generator(descriptions, photos, tokenizer, max_length, vocab_size):
 			in_img, in_seq, out_word = create_sequences(tokenizer, max_length, desc_list, photo, vocab_size)
 			yield [in_img, in_seq], out_word
  
-def train(model, train_descriptions, train_features, tokenizer, vocab_size): #maybe add batching?
+def train(model, train_descriptions, train_features, tokenizer, vocab_size, max_length): #maybe add batching?
 	steps = len(train_descriptions) # train the model, run epochs manually and save after each epoch
 	epochs = 1
 	for i in range(epochs):

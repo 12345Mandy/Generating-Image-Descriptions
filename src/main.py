@@ -40,7 +40,8 @@ print('Description Length: %d' % max_length)
 model = define_model(vocab_size, max_length) # define the model
 
 # train
-train(model, train_descriptions, train_features, tokenizer, vocab_size)
+train(model, train_descriptions, train_features, tokenizer, vocab_size, max_length)
+
 
 # load test set
 filename = '../data/Flickr8k_text/Flickr_8k.testImages.txt'
