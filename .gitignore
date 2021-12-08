@@ -1,2 +1,5 @@
 .DS_Store
 features.pkl
+vgg16-data/
+vgg16-data-split/
+src/features.pkl
