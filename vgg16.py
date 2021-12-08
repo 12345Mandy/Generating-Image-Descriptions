@@ -4,9 +4,7 @@
 # # from tensorflow.math import exp, sqrt, square
 # #https://towardsdatascience.com/step-by-step-vgg16-implementation-in-keras-for-beginners-a833c686ae6c
 from __future__ import absolute_import
-from matplotlib import pyplot as plt
-from preprocess import get_data
-from convolution import conv2d
+# from matplotlib import pyplot as plt
 
 import os
 import tensorflow as tf
@@ -97,19 +95,18 @@ def main():
     model = Model()
 
     # Path to train test split data 
-    path = 'animals_output'   # note don't recall where in file system this ends up so may need to change
+    path = 'vgg16-data-split'   # note don't recall where in file system this ends up so may need to change
     # checks if train_test split data has been made
     isSplit = os.path.isdir(path) 
     if not isSplit:
-        splitfolders.fixed("animals/raw-img", output='animals_output',seed=1337, fixed=100, oversample=False, group_prefix=None) # default values
-    else:
-        trdata = ImageDataGenerator()
-        traindata = trdata.flow_from_directory(directory="animals_output/train",target_size=(224,224))
-        tsdata = ImageDataGenerator()
-        testdata = tsdata.flow_from_directory(directory="animals_output/val", target_size=(224,224))
-        model.vgg16.compile(optimizer=model.optimizer, loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False), metrics=['accuracy'])   
-        model.call(testdata, traindata)
-        model.vgg16.summary()
+        splitfolders.fixed("vgg16-data/raw-img", output='vgg16-data-split',seed=1337, fixed=100, oversample=False, group_prefix=None) # default values
+    trdata = ImageDataGenerator()
+    traindata = trdata.flow_from_directory(directory="vgg16-data-split/train",target_size=(224,224))
+    tsdata = ImageDataGenerator()
+    testdata = tsdata.flow_from_directory(directory="vgg16-data-split/val", target_size=(224,224))
+    model.vgg16.compile(optimizer=model.optimizer, loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False), metrics=['accuracy'])   
+    model.call(testdata, traindata)
+    model.vgg16.summary()
 
 
 
