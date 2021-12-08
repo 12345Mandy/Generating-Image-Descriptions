@@ -1,15 +1,30 @@
-# import tensorflow as tf
-# from tensorflow.keras import Sequential
-# from tensorflow.keras.layers import Dense, Flatten, Reshape
-# from tensorflow.math import exp, sqrt, square
-#https://towardsdatascience.com/step-by-step-vgg16-implementation-in-keras-for-beginners-a833c686ae6c
-import keras,os
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, MaxPool2D , Flatten
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-import numpy as np
+# # import tensorflow as tf
+# # from tensorflow.keras import Sequential
+# # from tensorflow.keras.layers import Dense, Flatten, Reshape
+# # from tensorflow.math import exp, sqrt, square
+# #https://towardsdatascience.com/step-by-step-vgg16-implementation-in-keras-for-beginners-a833c686ae6c
+from __future__ import absolute_import
+from matplotlib import pyplot as plt
+from preprocess import get_data
+from convolution import conv2d
 
-class vgg(tf.keras.Model):
+import os
+import tensorflow as tf
+import numpy as np
+import random
+import math
+import splitfolders
+
+import tensorflow as tf
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, Flatten, Reshape, Conv2D, MaxPool2D 
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.math import exp, sqrt, square
+
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+
+
+class Model(tf.keras.Model):
     def __init__(self):
         """
         This model class will contain the architecture for your CNN that 
@@ -20,8 +35,21 @@ class vgg(tf.keras.Model):
         # The model class inherits from tf.keras.Model.
         # It stores the trainable weights as attributes.
         super(Model, self).__init__()
-        self.model = tf.keras.Sequential([
-            tf.keras.layers.Flatten(), 
+
+        self.batch_size = 64
+        self.num_classes = 2
+        self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
+
+        # TODO: Initialize all hyperparameters
+            # Choosing an optimizer
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001) 
+        self.image_width = 224
+        self.image_height = 224
+        self.in_channels = 3
+        self.num_epochs = 10
+
+        self.vgg16 = tf.keras.Sequential([
+            # tf.keras.layers.Resizing(self.image_height, self.image_width, interpolation="bilinear", crop_to_aspect_ratio=False),
             tf.keras.layers.Conv2D(input_shape=(224,224,3),filters=64,kernel_size=(3,3),padding="same", activation="relu"),
             tf.keras.layers.Conv2D(filters=64,kernel_size=(3,3),padding="same", activation="relu"),
             tf.keras.layers.MaxPool2D(pool_size=(2,2),strides=(2,2)),
@@ -39,140 +67,52 @@ class vgg(tf.keras.Model):
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(units=4096,activation="relu"),
             tf.keras.layers.Dense(units=4096,activation="relu"),
-            tf.keras.layers.Dense(units=2, activation="softmax")
+            tf.keras.layers.Dense(units=10, activation="softmax")
             ])
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001) 
 
-        # model = Sequential()
-        # model.add(Conv2D(input_shape=(224,224,3),filters=64,kernel_size=(3,3),padding="same", activation="relu"))
-        # model.add(Conv2D(filters=64,kernel_size=(3,3),padding="same", activation="relu"))
-        # model.add(MaxPool2D(pool_size=(2,2),strides=(2,2)))
-        # model.add(Conv2D(filters=128, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(Conv2D(filters=128, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(MaxPool2D(pool_size=(2,2),strides=(2,2)))
-        # model.add(Conv2D(filters=256, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(Conv2D(filters=256, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(Conv2D(filters=256, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(MaxPool2D(pool_size=(2,2),strides=(2,2)))
-        # model.add(Conv2D(filters=512, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(Conv2D(filters=512, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(Conv2D(filters=512, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(MaxPool2D(pool_size=(2,2),strides=(2,2)))
-        # model.add(Conv2D(filters=512, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(Conv2D(filters=512, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(Conv2D(filters=512, kernel_size=(3,3), padding="same", activation="relu"))
-        # model.add(MaxPool2D(pool_size=(2,2),strides=(2,2)))
+       
 
-        self.batch_size = 64
-        self.num_classes = 2
-        self.loss_list = [] # Append losses to this list in training so you can visualize loss vs time in main
-
-        # TODO: Initialize all hyperparameters
-            # Choosing an optimizer
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=0.001) 
-        self.image_width = 32
-        self.image_height = 32
-        self.in_channels = 3
-        self.num_epochs = 10
-
-
-
-        # TODO: Initialize all trainable parameters
-        # filters
-        self.filter1 = tf.Variable(tf.random.truncated_normal([5,5,3,16], stddev=0.1))
-        self.filter2 = tf.Variable(tf.random.truncated_normal([5,5,16,20], stddev=0.1))
-        self.filter3 = tf.Variable(tf.random.truncated_normal([3,3,20,20], stddev=0.1))
-
-        #initialise biases for convolution layers
-        self.convolution_b1 = tf.Variable(tf.random.truncated_normal(shape = [16], stddev=.1, dtype=tf.float32))
-        self.convolution_b2 = tf.Variable(tf.random.truncated_normal(shape = [20], stddev=.1, dtype=tf.float32))
-        self.convolution_b3 = tf.Variable(tf.random.truncated_normal(shape = [20], stddev=.1, dtype=tf.float32))
         
-        # Initialize your variables (weights) here:
-        self.W1 = tf.Variable(tf.random.truncated_normal(shape=[320,220], stddev=.1, dtype=tf.float32))
-        self.b1 = tf.Variable(tf.random.truncated_normal(shape = [220], stddev=.1, dtype=tf.float32))
-        self.W2 = tf.Variable(tf.random.truncated_normal(shape=[220, 220], stddev=.1, dtype=tf.float32))
-        self.b2 = tf.Variable(tf.random.truncated_normal([220], stddev=.1, dtype=tf.float32))
-        self.W3 = tf.Variable(tf.random.truncated_normal(shape=[220,2], stddev=.1, dtype=tf.float32))
-        self.b3 = tf.Variable(tf.random.truncated_normal([2], stddev=.1, dtype=tf.float32))
-    # def __init__(self, input_size, latent_size=15):
-    #     super(VAE, self).__init__()
-    #     self.input_size = input_size # H*W
-    #     self.latent_size = latent_size  # Z
-    #     self.image_size = 28 ## a constant
-    #     self.hidden_dim = 512  # H_d
-    #     self.encoder = tf.keras.Sequential([
-    #         tf.keras.layers.Flatten(), 
-    #         tf.keras.layers.Dense(self.hidden_dim, activation='relu'),
-    #         tf.keras.layers.Dense(self.hidden_dim, activation='relu'),
-    #         tf.keras.layers.Dense(self.hidden_dim, activation='relu')])
-    #     self.mu_layer = tf.keras.layers.Dense(self.latent_size, activation=None)
-    #     self.logvar_layer = tf.keras.layers.Dense(self.latent_size, activation=None)
 
-    #     self.decoder = tf.keras.models.Sequential()
-    #     self.decoder.add(tf.keras.Input(shape=(self.latent_size,)))
-    #     self.decoder.add(tf.keras.layers.Dense(self.hidden_dim, activation='relu'))
-    #     self.decoder.add(tf.keras.layers.Dense(self.hidden_dim, activation='relu'))
-    #     self.decoder.add(tf.keras.layers.Dense(self.hidden_dim, activation='relu'))
-    #     self.decoder.add(tf.keras.layers.Dense(self.image_size*self.image_size, activation='sigmoid'))
-    #     self.decoder.add(tf.keras.layers.Reshape((1, self.image_size, self.image_size)))
-
-        ############################################################################################
-        # TODO: Implement the fully-connected encoder architecture described in the notebook.      #
-        # Specifically, self.encoder should be a network that inputs a batch of input images of    #
-        # shape (N, 1, H, W) into a batch of hidden features of shape (N, H_d). Set up             #
-        # self.mu_layer and self.logvar_layer to be a pair of linear layers that map the hidden    #
-        # features into estimates of the mean and log-variance of the posterior over the latent    #
-        # vectors; the mean and log-variance estimates will both be tensors of shape (N, Z).       #
-        ############################################################################################
-        # Replace "pass" statement with your code
-
-        #pass
-
-        ############################################################################################
-        # TODO: Implement the fully-connected decoder architecture described in the notebook.      #
-        # Specifically, self.decoder should be a network that inputs a batch of latent vectors of  #
-        # shape (N, Z) and outputs a tensor of estimated images of shape (N, 1, H, W).             #
-        ############################################################################################
-        # Replace "pass" statement with your code
-        #pass
-
-        ############################################################################################
-        #                                      END OF YOUR CODE                                    #
-        ############################################################################################
-
-    def call(self, x):
+    def call(self, testdata, traindata):
         """
-        Performs forward pass through FC-VAE model by passing image through 
-        encoder, reparametrize trick, and decoder models
+        Runs a forward pass on input .
+        
+        """
+        checkpoint = ModelCheckpoint("vgg16_1.h5", monitor='val_acc', verbose=1, save_best_only=True, save_weights_only=False, mode='auto', period=1)
+        early = EarlyStopping(monitor='val_acc', min_delta=0, patience=20, verbose=1, mode='auto')
+        hist = self.vgg16.fit_generator(steps_per_epoch=100,generator=traindata, validation_data= testdata, validation_steps=10,epochs=1,callbacks=[checkpoint,early])
+
+
+
+
+def main():
+    '''
+    Loads images and fits vgg16 model 
     
-        Inputs:
-        - x: Batch of input images of shape (N, 1, H, W)
-        
-        Returns:
-        - x_hat: Reconstruced input data of shape (N,1,H,W)
-        - mu: Matrix representing estimated posterior mu (N, Z), with Z latent space dimension
-        - logvar: Matrix representing estimataed variance in log-space (N, Z), with Z latent space dimension
-        """
-        x_hat = None
-        mu = None
-        logvar = None
-        ############################################################################################
-        # TODO: Implement the forward pass by following these steps                                #
-        # (1) Pass the input batch through the encoder model to get posterior mu and logvariance   #
-        # (2) Reparametrize to compute  the latent vector z                                        #
-        # (3) Pass z through the decoder to resconstruct x                                         #
-        ############################################################################################
-        # Replace "pass" statement with your code
-        output_encoder = self.encoder(x)
-        mu = self.mu_layer(output_encoder)
-        logvar = self.logvar_layer(output_encoder)
-        z = reparametrize(mu, logvar)
-        x_hat = self.decoder(z)
+    :return: None
+    '''
+    # Instantiate our model
+    model = Model()
+
+    # Path to train test split data 
+    path = 'animals_output'   # note don't recall where in file system this ends up so may need to change
+    # checks if train_test split data has been made
+    isSplit = os.path.isdir(path) 
+    if not isSplit:
+        splitfolders.fixed("animals/raw-img", output='animals_output',seed=1337, fixed=100, oversample=False, group_prefix=None) # default values
+    else:
+        trdata = ImageDataGenerator()
+        traindata = trdata.flow_from_directory(directory="animals_output/train",target_size=(224,224))
+        tsdata = ImageDataGenerator()
+        testdata = tsdata.flow_from_directory(directory="animals_output/val", target_size=(224,224))
+        model.vgg16.compile(optimizer=model.optimizer, loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False), metrics=['accuracy'])   
+        model.call(testdata, traindata)
+        model.vgg16.summary()
 
 
 
-        ############################################################################################
-        #                                      END OF YOUR CODE                                    #
-        ############################################################################################
-        return x_hat, mu, logvar
+
+if __name__ == '__main__':
+    main()
