@@ -7,7 +7,6 @@ from tensorflow.python.keras.engine.input_layer import Input
 from tensorflow.python.keras.models import Model
 from keras_preprocessing.text import Tokenizer
 from tensorflow.python.keras.utils.np_utils import to_categorical
-# from tensorflow.python.keras.utils.vis_utils import plot_model 
 from tensorflow.keras.models import load_model
 from utils import *
 import constant
@@ -16,27 +15,20 @@ import constant
 
 # load doc into memory
 def load_doc(filename):
-	# open the file as read only
 	file = open(filename, 'r')
-	# read all text
 	text = file.read()
-	# close the file
 	file.close()
 	return text
 
 def load_set(filename):
 	doc = load_doc(filename)
 	dataset = list()
-	# process line by line
 	for line in doc.split('\n'):
-		# skip empty lines
 		if len(line) < 1:
 			continue
-		# get the image identifier
 		identifier = line.split('.')[0]
 		dataset.append(identifier)
 	return set(dataset)
-
 
 ## was originally in train 
 
@@ -76,23 +68,16 @@ def to_lines(descriptions):
 		[all_desc.append(d) for d in descriptions[key]]
 	return all_desc
  
- 
 # create sequences of images, input sequences and output words for an image
-# def create_sequences(tokenizer, max_length, desc_list, photo, vocab_size):
 def create_sequences(max_length, desc_list, photo, vocab_size, word_to_index):
 	X1, X2, y = list(), list(), list()
 	# walk through each description for the image
 	for desc in desc_list:
-		# encode the sequence
-
 		seq = [word_to_index[w] for w in desc.split() if w in word_to_index]
 		# split one sequence into multiple X,y pairs
 		for i in range(1, len(seq)):
 			# split into input and output pair
 			in_seq, out_seq = seq[:i], seq[i]
-			# pad input sequence
-			# print(type(in_seq))
-			# print(type(max_length))
 			in_seq = pad_sequences([in_seq], maxlen=max_length)[0]
 			# encode output sequence
 			out_seq = to_categorical([out_seq], num_classes=vocab_size)[0]
@@ -104,13 +89,10 @@ def create_sequences(max_length, desc_list, photo, vocab_size, word_to_index):
  
  
 # data generator, intended to be used in a call to model.fit_generator()
-# def data_generator(descriptions, photos, tokenizer, max_length, vocab_size):
 def data_generator(descriptions, photos, max_length, vocab_size, word_to_index):
-	# loop for ever over images
 	while 1:
 		for key, desc_list in descriptions.items():
 			# retrieve the photo feature
 			photo = photos[key][0]
-			# in_img, in_seq, out_word = create_sequences(tokenizer, max_length, desc_list, photo, vocab_size)
 			in_img, in_seq, out_word = create_sequences(max_length, desc_list, photo, vocab_size, word_to_index)
 			yield [in_img, in_seq], out_word
