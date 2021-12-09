@@ -7,8 +7,7 @@ from tensorflow.python.keras.engine.input_layer import Input
 from tensorflow.python.keras.models import Model
 from keras_preprocessing.text import Tokenizer
 from tensorflow.python.keras.utils.np_utils import to_categorical
-# from tensorflow.python.keras.utils.vis_utils import plot_model
-from nltk.translate.bleu_score import corpus_bleu 
+# from tensorflow.python.keras.utils.vis_utils import plot_model 
 from tensorflow.keras.models import load_model
 from utils import *
 
@@ -61,12 +60,14 @@ def max_length(descriptions):
 	return max(len(d.split()) for d in lines)
  
 # create sequences of images, input sequences and output words for an image
-def create_sequences(tokenizer, max_length, desc_list, photo, vocab_size):
+# def create_sequences(tokenizer, max_length, desc_list, photo, vocab_size):
+def create_sequences(max_length, desc_list, photo, vocab_size, word_to_index):
 	X1, X2, y = list(), list(), list()
 	# walk through each description for the image
 	for desc in desc_list:
 		# encode the sequence
-		seq = tokenizer.texts_to_sequences([desc])[0]
+
+		seq = [word_to_index[w] for w in desc.split() if w in word_to_index]
 		# split one sequence into multiple X,y pairs
 		for i in range(1, len(seq)):
 			# split into input and output pair
@@ -112,73 +113,26 @@ def define_model(vocab_size, max_length):
 	return model
  
 # data generator, intended to be used in a call to model.fit_generator()
-def data_generator(descriptions, photos, tokenizer, max_length, vocab_size):
+# def data_generator(descriptions, photos, tokenizer, max_length, vocab_size):
+def data_generator(descriptions, photos, max_length, vocab_size, word_to_index):
 	# loop for ever over images
 	while 1:
 		for key, desc_list in descriptions.items():
 			# retrieve the photo feature
 			photo = photos[key][0]
-			in_img, in_seq, out_word = create_sequences(tokenizer, max_length, desc_list, photo, vocab_size)
+			# in_img, in_seq, out_word = create_sequences(tokenizer, max_length, desc_list, photo, vocab_size)
+			in_img, in_seq, out_word = create_sequences(max_length, desc_list, photo, vocab_size, word_to_index)
 			yield [in_img, in_seq], out_word
  
-def train(model, train_descriptions, train_features, tokenizer, vocab_size, max_length): #maybe add batching?
+# def train(model, train_descriptions, train_features, tokenizer, vocab_size, max_length): #maybe add batching?
+def train(model, train_descriptions, train_features, vocab_size, max_length, word_to_index): #maybe add batching?
 	steps = len(train_descriptions) # train the model, run epochs manually and save after each epoch
 	epochs = 1
 	for i in range(epochs):
 		# create the data generator
-		generator = data_generator(train_descriptions, train_features, tokenizer, max_length, vocab_size)
+		# generator = data_generator(train_descriptions, train_features, tokenizer, max_length, vocab_size)
+		generator = data_generator(train_descriptions, train_features, max_length, vocab_size, word_to_index)
 		# fit for one epoch
 		model.fit_generator(generator, epochs=1, steps_per_epoch=steps, verbose=1)
 		# save model
 		model.save('model_' + str(i) + '.h5')
-
-# map an integer to a word
-def word_for_id(integer, tokenizer):
-	for word, index in tokenizer.word_index.items():
-		if index == integer:
-			return word
-	return None
- 
-# generate a description for an image
-def generate_desc(model, tokenizer, photo, max_length):
-	# seed the generation process
-	in_text = 'startseq'
-	# iterate over the whole length of the sequence
-	for i in range(max_length):
-		# integer encode input sequence
-		sequence = tokenizer.texts_to_sequences([in_text])[0]
-		# pad input
-		sequence = pad_sequences([sequence], maxlen=max_length)
-		# predict next word
-		yhat = model.predict([photo,sequence], verbose=0)
-		# convert probability to integer
-		yhat = np.argmax(yhat)
-		# map integer to word
-		word = word_for_id(yhat, tokenizer)
-		# stop if we cannot map the word
-		if word is None:
-			break
-		# append as input for generating the next word
-		in_text += ' ' + word
-		# stop if we predict the end of the sequence
-		if word == 'endseq':
-			break
-	return in_text
- 
-# evaluate the skill of the model
-# test
-def evaluate_model(model, descriptions, photos, tokenizer, max_length):
-	actual, predicted = list(), list()
-	# step over the whole set
-	for key, desc_list in descriptions.items():
-		# generate description
-		yhat = generate_desc(model, tokenizer, photos[key], max_length)
-		# store actual and predicted
-		references = [d.split() for d in desc_list]
-		actual.append(references)
-		predicted.append(yhat.split())
-	# calculate BLEU score
-	print('BLEU-1: %f' % corpus_bleu(actual, predicted, weights=(1.0, 0, 0, 0)))
-	print('BLEU-2: %f' % corpus_bleu(actual, predicted, weights=(0.5, 0.5, 0, 0)))
-	print('BLEU-3: %f' % corpus_bleu(actual, predicted, weights=(0.3, 0.3, 0.3, 0)))
-	print('BLEU-4: %f' % corpus_bleu(actual, predicted, weights=(0.25, 0.25, 0.25, 0.25)))
