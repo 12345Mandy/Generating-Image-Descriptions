@@ -3,6 +3,7 @@
 # from os import listdir
 from pickle import dump#, load
 from nltk.translate.bleu_score import corpus_bleu
+from caption_gen_model import Caption_Gen
 # from keras.applications.vgg16 import VGG16
 # from keras.preprocessing.image import load_img
 # from keras.preprocessing.image import img_to_array
@@ -164,7 +165,9 @@ def main():
     ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # define the model-> TIP: this is our caption generator with the lstm stuff
     
-    model = define_model(vocab_size, max_description_length) 
+    #model = define_model(vocab_size, max_description_length) 
+    model = Caption_Gen(vocab_size, max_description_length)
+    model = model.get_model_GRU()
 
     # train
     # train(model, train_descriptions, train_features, tokenizer, vocab_size, max_description_length)
