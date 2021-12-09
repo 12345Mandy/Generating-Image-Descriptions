@@ -93,12 +93,13 @@ def define_model(vocab_size, max_length):
 	inputs2 = Input(shape=(max_length,))
 	se1 = Embedding(vocab_size, 256, mask_zero=True)(inputs2)
 	se2 = Dropout(0.5)(se1)
-	# se3 = GRU(256)(se2)
-	se3 = LSTM(256, return_sequences=True)(se2)
-	se4 = LSTM(256)(se3)
+	se3 = GRU(256)(se2)
+	# se3 = LSTM(256, return_sequences=True)(se2)
+	# se4 = LSTM(256)(se3)
 
 	# decoder model
-	decoder1 = add([fe2, se4])
+	# decoder1 = add([fe2, se4])
+	decoder1 = add([fe2, se3])
 	decoder2 = Dense(256, activation='relu')(decoder1)
 	outputs = Dense(vocab_size, activation='softmax')(decoder2)
 	# tie it together [image, seq] [word]

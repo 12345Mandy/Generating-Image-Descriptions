@@ -21,25 +21,37 @@ TRAIN_IMAGES_FILENAME = '../data/Flickr8k_text/Flickr_8k.trainImages.txt'
 TEST_IMAGES_FILENAME = '../data/Flickr8k_text/Flickr_8k.testImages.txt'
 MODEL_FILENAME = 'model_0.h5' ## this should be created after running train
 
-# def load_descriptions_and_features():
+
+def load_descriptions_and_features(filename, train_or_test):
+    # load training dataset (6K)
+    filename = filename
+    dataset = load_set(filename)
+    print('Dataset', train_or_test, ': = %d' % len(dataset))
+    # descriptions
+    descriptions = load_clean_descriptions('descriptions.txt', dataset)
+    print('Descriptions', train_or_test, ': = %d' % len(descriptions))
+    # photo features
+    features = load_photo_features('features.pkl', dataset)
+    print('Photos', train_or_test, ': = %d' % len(features))
+    return descriptions, features
 
 
+
+# filename = TEST_IMAGES_FILENAME
+#     test = load_set(filename)
+#     print('Dataset: %d' % len(test))
+#     # descriptions
+#     test_descriptions = load_clean_descriptions('descriptions.txt', test)
+#     print('Descriptions: test=%d' % len(test_descriptions))
+#     # photo features
+#     test_features = load_photo_features('features.pkl', test)
+#     print('Photos: test=%d' % len(test_features))
 
 
 def main():
-    # right now main assumes preprocess has been run
     preprocess_load_all()
     # load training dataset (6K)
-    filename = TRAIN_IMAGES_FILENAME
-    train_stuff = load_set(filename)
-    print('Dataset: %d' % len(train_stuff))
-    # descriptions
-    train_descriptions = load_clean_descriptions('descriptions.txt', train_stuff)
-    print('Descriptions: train=%d' % len(train_descriptions))
-    # photo features
-    train_features = load_photo_features('features.pkl', train_stuff)
-    print('Photos: train=%d' % len(train_features))
-
+    train_descriptions, train_features = load_descriptions_and_features(TRAIN_IMAGES_FILENAME, "train")
     # prepare tokenizer
     tokenizer = create_tokenizer(train_descriptions)
     vocab_size = len(tokenizer.word_index) + 1
@@ -49,25 +61,18 @@ def main():
     print('Description Length: %d' % max_description_length)
 
     ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # model = define_model(vocab_size, max_description_length) # define the model
+    # define the model-> TIP: this is our caption generator with the lstm stuff
+    model = define_model(vocab_size, max_description_length) 
 
-    # # train
-    # train(model, train_descriptions, train_features, tokenizer, vocab_size, max_description_length)
+    # train
+    train(model, train_descriptions, train_features, tokenizer, vocab_size, max_description_length)
 
     ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # load test set
-    filename = TEST_IMAGES_FILENAME
-    test = load_set(filename)
-    print('Dataset: %d' % len(test))
-    # descriptions
-    test_descriptions = load_clean_descriptions('descriptions.txt', test)
-    print('Descriptions: test=%d' % len(test_descriptions))
-    # photo features
-    test_features = load_photo_features('features.pkl', test)
-    print('Photos: test=%d' % len(test_features))
+    # test
+    test_descriptions, test_features = load_descriptions_and_features(TEST_IMAGES_FILENAME, "test")
     
-    # # load the model
-    filename = 'model_0.h5'
+    # load the model that has just been trained
+    filename = MODEL_FILENAME
     model = load_model(filename)
     # evaluate model
     evaluate_model(model, test_descriptions, test_features, tokenizer, max_description_length)
