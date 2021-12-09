@@ -76,11 +76,6 @@ def to_lines(descriptions):
 		[all_desc.append(d) for d in descriptions[key]]
 	return all_desc
  
-# #TODO: don't make max_length its own function
-# calculate the length of the description with the most words
-def max_length(descriptions):
-	lines = to_lines(descriptions)
-	return max(len(d.split()) for d in lines)
  
 # create sequences of images, input sequences and output words for an image
 # def create_sequences(tokenizer, max_length, desc_list, photo, vocab_size):
@@ -107,33 +102,6 @@ def create_sequences(max_length, desc_list, photo, vocab_size, word_to_index):
 			y.append(out_seq)
 	return array(X1), array(X2), array(y)
  
-# define the captioning model #change all this to be how we do it 
-# def define_model(vocab_size, max_length):
-# 	# feature extractor model
-# 	inputs1 = Input(shape=(4096,))
-# 	fe1 = Dropout(0.5)(inputs1)
-# 	fe2 = Dense(256, activation='relu')(fe1)
-# 	# sequence model
-# 	inputs2 = Input(shape=(max_length,))
-# 	se1 = Embedding(vocab_size, 256, mask_zero=True)(inputs2)
-# 	se2 = Dropout(0.5)(se1)
-# 	se3 = GRU(256)(se2)
-# 	# se3 = LSTM(256, return_sequences=True)(se2)
-# 	# se4 = LSTM(256)(se3)
-
-# 	# decoder model
-# 	# decoder1 = add([fe2, se4])
-# 	decoder1 = add([fe2, se3])
-# 	decoder2 = Dense(256, activation='relu')(decoder1)
-# 	outputs = Dense(vocab_size, activation='softmax')(decoder2)
-# 	# tie it together [image, seq] [word]
-# 	model = Model(inputs=[inputs1, inputs2], outputs=outputs)
-# 	# compile model
-# 	model.compile(loss='categorical_crossentropy', optimizer='adam')
-# 	# summarize model
-# 	model.summary()
-# 	# plot_model(model, to_file='model.png', show_shapes=True)
-# 	return model
  
 # data generator, intended to be used in a call to model.fit_generator()
 # def data_generator(descriptions, photos, tokenizer, max_length, vocab_size):

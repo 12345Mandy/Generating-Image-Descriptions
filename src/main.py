@@ -16,7 +16,7 @@ from caption_gen_model import Caption_Gen
 # from array import array
 
 from preprocess import *
-from train import *
+# from train import *
 from utils import *
 from constant import *
 
@@ -158,8 +158,9 @@ def main():
     vocab_size = len(index_to_word) + 1 
     # vocab_size = len(tokenizer.word_index) + 1
     print('Vocabulary Size: %d' % vocab_size)
-
-    max_description_length = max_length(train_descriptions)
+    lines = to_lines(train_descriptions)
+    max_description_length = max(len(d.split()) for d in lines)
+    #max_description_length = max_length(train_descriptions)
     print('Description Length: %d' % max_description_length)
 
     ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
