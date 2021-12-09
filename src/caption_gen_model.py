@@ -12,11 +12,6 @@ from tensorflow.keras.models import load_model
 from utils import *
 import constant
 
-#TODO: 
-#1. make epoch a constant here?
-#2. remove tokenizer completely from here
-#3. potentially change ifs to opposite
-# shift train to main and make this its own class.
 
 
 class Caption_Gen(tf.keras.Model):
