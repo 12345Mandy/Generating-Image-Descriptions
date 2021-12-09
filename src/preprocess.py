@@ -1,4 +1,5 @@
 import tensorflow as tf
+import os
 from os import listdir
 from pickle import dump
 from tensorflow.keras.preprocessing.image import load_img
@@ -94,23 +95,76 @@ def save_descriptions(descriptions, filename):
 	file.write(data)
 	file.close()
 
-# extract features from all images
-directory = '../data/Flicker8k_Dataset'
-features = extract_photo_features(directory)
-print('Extracted Features: %d' % len(features))
-# save to file
-dump(features, open('features.pkl', 'wb')) #this creates features file
 
-file = '../data/Flickr8k_text/Flickr8k.token.txt' #these are like the labels, pregenerated captions
-# load descriptions
-doc = load_doc(file)
-# parse descriptions
-descriptions = load_descriptions(doc)
-print('Loaded: %d ' % len(descriptions))
-# clean descriptions
-clean_descriptions(descriptions)
-# summarize vocabulary
-vocabulary = to_vocabulary(descriptions)
-print('Vocabulary Size: %d' % len(vocabulary))
-# save to file
-save_descriptions(descriptions, 'descriptions.txt') #these are the labels, what we train based off of (modify to remove prepositions and stuff)
+def save_photo_features():
+	# extract features from all images
+	directory = '../data/Flicker8k_Dataset'
+	features = extract_photo_features(directory)
+	print('Extracted Features: %d' % len(features))
+	# save to file
+	dump(features, open('features.pkl', 'wb')) #this creates features file
+	
+
+def save_clean_descriptions():
+	file = '../data/Flickr8k_text/Flickr8k.token.txt' #these are like the labels, pregenerated captions
+	# load descriptions
+	doc = load_doc(file)
+	# parse descriptions
+	descriptions = load_descriptions(doc)
+	print('Loaded: %d ' % len(descriptions))
+	# clean descriptions
+	clean_descriptions(descriptions)
+	# summarize vocabulary
+	vocabulary = to_vocabulary(descriptions)
+	print('Vocabulary Size: %d' % len(vocabulary))
+	# save to file
+	save_descriptions(descriptions, 'descriptions.txt') #these are the labels, what we train based off of (modify to remove prepositions and stuff)
+
+
+
+def preprocess_load_all():
+	'''
+    Loads image features/embeddings and cleaned descriptions into
+	features.pkl and descriptions.txt respectively 
+	ONLY IF THESE FILES DO NOT EXIST
+	otherwise will do nothing
+    
+    :return: None
+    '''
+	photo_features_path = 'features.pkl'   # assuming u are running src
+	descriptions_path = 'descriptions.txt'   # assuming u are running src
+	isFeatureExtracted = os.path.exists(photo_features_path)
+	existsDescriptions = os.path.exists(descriptions_path)
+	if not isFeatureExtracted:
+		print("CREATING features.pkl")
+		save_photo_features()
+	print("SAVED features.pkl")
+	if not existsDescriptions:
+		print("CREATING descriptions.txt")
+		save_clean_descriptions()
+	print("SAVED descriptions.txt")
+
+	
+
+
+	
+# # extract features from all images
+# directory = '../data/Flicker8k_Dataset'
+# features = extract_photo_features(directory)
+# print('Extracted Features: %d' % len(features))
+# # save to file
+# dump(features, open('features.pkl', 'wb')) #this creates features file
+
+# file = '../data/Flickr8k_text/Flickr8k.token.txt' #these are like the labels, pregenerated captions
+# # load descriptions
+# doc = load_doc(file)
+# # parse descriptions
+# descriptions = load_descriptions(doc)
+# print('Loaded: %d ' % len(descriptions))
+# # clean descriptions
+# clean_descriptions(descriptions)
+# # summarize vocabulary
+# vocabulary = to_vocabulary(descriptions)
+# print('Vocabulary Size: %d' % len(vocabulary))
+# # save to file
+# save_descriptions(descriptions, 'descriptions.txt') #these are the labels, what we train based off of (modify to remove prepositions and stuff)

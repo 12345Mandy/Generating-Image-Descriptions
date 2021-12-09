@@ -13,12 +13,12 @@ from pickle import dump#, load
 # from tensorflow.python.keras.utils.np_utils import to_categorical
 # from array import array
 
-# from preprocess import *
+from preprocess import *
 from train import *
 from utils import *
 
 # right now main assumes preprocess has been run
-
+preprocess_load_all()
 # load training dataset (6K)
 filename = '../data/Flickr8k_text/Flickr_8k.trainImages.txt'
 train_stuff = load_set(filename)
@@ -61,3 +61,13 @@ filename = 'model_0.h5'
 model = load_model(filename)
 # evaluate model
 evaluate_model(model, test_descriptions, test_features, tokenizer, max_length)
+
+
+
+# def main():
+
+ 
+
+
+# if __name__ == '__main__':
+#     main()

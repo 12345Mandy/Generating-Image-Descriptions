@@ -95,7 +95,7 @@ def main():
     model = Model()
 
     # Path to train test split data 
-    path = 'vgg16-data-split'   # note don't recall where in file system this ends up so may need to change
+    path = 'vgg16-data-split'   # note that this is assuming u run from root
     # checks if train_test split data has been made
     isSplit = os.path.isdir(path) 
     if not isSplit:
