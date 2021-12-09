@@ -64,6 +64,7 @@ def create_tokenizer(descriptions):
 	tokenizer.fit_on_texts(lines)
 	return tokenizer
  
+# #TODO: don't make max_length its own function
 # calculate the length of the description with the most words
 def max_length(descriptions):
 	lines = to_lines(descriptions)
