@@ -84,6 +84,8 @@ def to_vocabulary(descriptions):
 		[all_desc.update(d.split()) for d in descriptions[key]]
 	return all_desc
  
+
+ ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~new functions~~~~~~~~~~~~~~~~~~
 # save descriptions to file, one per line
 def save_descriptions(descriptions, filename):
 	lines = list()
