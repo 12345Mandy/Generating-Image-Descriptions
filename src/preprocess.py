@@ -7,6 +7,7 @@ from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications.vgg16 import preprocess_input
 import string
 from utils import load_doc
+from constant import *
  
 # extract features from each photo in the directory
 def extract_photo_features(directory): #this needs to stay 
@@ -75,6 +76,44 @@ def clean_descriptions(descriptions):
 			desc = [word for word in desc if word.isalpha()]
 			# store as string
 			desc_list[i] =  ' '.join(desc)
+
+# def create_clean_descriptions_map(unclean_desc_doc):
+# 	id_desc_map = dict()
+# 	# process lines
+# 	for line in unclean_desc_doc.split('\n'):
+# 		# split line by white space
+# 		tokens = line.split()
+# 		if len(line) < 2:
+# 			continue
+# 		# take the first token as the image id, and remove filename from it
+# 		image_id = tok[0].split('.')[0]
+# 		# rest is description
+# 		image_desc = tok[1:]
+# 		# # convert description tokens back to string
+# 		# image_desc = ' '.join(image_desc)
+# 		# convert to lower case
+# 		image_desc = [word.lower() for word in desc]
+# 		# remove punctuation from each token
+# 		image_desc = [w.translate(table) for w in desc]
+# 		# remove hanging 's' and 'a'
+# 		image_desc = [word for word in desc if len(word)>1]
+# 		# remove tokens with numbers in them
+# 		image_desc = [word for word in desc if word.isalpha()]
+# 		if image_id not in id_desc_map:
+# 			id_desc_map[image_id] = list()
+      
+#       # Cleanup description
+#       desc = [word.lower() for word in desc]
+#       desc = [w.translate(null_punct) for w in desc]
+#       desc = [word for word in desc if len(word)>1]
+#       desc = [word for word in desc if word.isalpha()]
+#       max_length = max(max_length,len(desc))
+      
+#       if id not in lookup:
+#         lookup[id] = list()
+#       lookup[id].append(' '.join(desc))
+
+
  
 # convert the loaded descriptions into a vocabulary of words
 def to_vocabulary(descriptions):

@@ -1,0 +1,9 @@
+TRAIN_IMAGES_FILENAME = '../data/Flickr8k_text/Flickr_8k.trainImages.txt'
+TEST_IMAGES_FILENAME = '../data/Flickr8k_text/Flickr_8k.testImages.txt'
+DESCRIPTIONS_UNCLEAN_FILENAME = '../data/Flickr8k_text/Flickr8k.token.txt'
+PHOTOS_DIRECTORY = '../data/Flicker8k_Dataset'
+MODEL_FILENAME = 'model_0.h5' ## this should be created after running train
+STARTSEQ = 'startseq'
+ENDSEQ = 'endseq'
+THRESH = 10
+EPOCH = 1

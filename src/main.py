@@ -17,13 +17,16 @@ from nltk.translate.bleu_score import corpus_bleu
 from preprocess import *
 from train import *
 from utils import *
+from constant import *
 
-TRAIN_IMAGES_FILENAME = '../data/Flickr8k_text/Flickr_8k.trainImages.txt'
-TEST_IMAGES_FILENAME = '../data/Flickr8k_text/Flickr_8k.testImages.txt'
-MODEL_FILENAME = 'model_0.h5' ## this should be created after running train
-STARTSEQ = 'startseq'
-ENDSEQ = 'endseq'
-THRESH = 10
+# TRAIN_IMAGES_FILENAME = '../data/Flickr8k_text/Flickr_8k.trainImages.txt'
+# TEST_IMAGES_FILENAME = '../data/Flickr8k_text/Flickr_8k.testImages.txt'
+# MODEL_FILENAME = 'model_0.h5' ## this should be created after running train
+# STARTSEQ = 'startseq'
+# ENDSEQ = 'endseq'
+# THRESH = 10
+
+# TODO: potentially shift all functions besides train, bleu and main to utils
 
 def load_descriptions_and_features(filename, train_or_test):
     # load training dataset (6K)
@@ -96,17 +99,32 @@ def clean_up_caption(desc):
     desc = ' '.join(desc)
     return desc
 
+def train(model, train_descriptions, train_features, vocab_size, max_length, word_to_index): 
+	steps = len(train_descriptions) # train the model, run epochs manually and save after each epoch
+	for i in range(constant.EPOCH):
+		# create the data generator
+		# generator = data_generator(train_descriptions, train_features, tokenizer, max_length, vocab_size)
+		generator = data_generator(train_descriptions, train_features, max_length, vocab_size, word_to_index)
+		# fit for one epoch
+		model.fit_generator(generator, epochs=constant.EPOCH, steps_per_epoch=steps, verbose=1)
+		# save model
+		model.save('model_' + str(i) + '.h5')
+
 # test the model using bleu
 # def bleu(model, descriptions, photos, tokenizer, max_length):
 def bleu(model, descriptions, photos, max_length, indextoword, wordtoindex):
     actual, predicted = list(), list()
+    acc = 0
     for key, list_of_descr in descriptions.items():
         # generated = generate_caption(model, tokenizer, photos[key], max_length)
+        print(key, acc)
         generated = generate_caption(model, photos[key], max_length, indextoword, wordtoindex)
         generated = generated.split()
         references = [desc.split() for desc in list_of_descr]
         actual.append(references)
         predicted.append(generated)
+        acc = acc + 1
+        
     print('BLEU-1: %f' % corpus_bleu(actual, predicted, weights=(1.0, 0, 0, 0)))
     print('BLEU-2: %f' % corpus_bleu(actual, predicted, weights=(0.5, 0.5, 0, 0)))
     print('BLEU-3: %f' % corpus_bleu(actual, predicted, weights=(0.3, 0.3, 0.3, 0)))
@@ -146,12 +164,12 @@ def main():
     ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # define the model-> TIP: this is our caption generator with the lstm stuff
     
-    # model = define_model(vocab_size, max_description_length) 
+    model = define_model(vocab_size, max_description_length) 
 
     # train
     # train(model, train_descriptions, train_features, tokenizer, vocab_size, max_description_length)
     
-    # train(model, train_descriptions, train_features, vocab_size, max_description_length, word_to_index)
+    train(model, train_descriptions, train_features, vocab_size, max_description_length, word_to_index)
 
     ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # test

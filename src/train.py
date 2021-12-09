@@ -10,6 +10,16 @@ from tensorflow.python.keras.utils.np_utils import to_categorical
 # from tensorflow.python.keras.utils.vis_utils import plot_model 
 from tensorflow.keras.models import load_model
 from utils import *
+import constant
+
+#TODO: 
+#1. make epoch a constant here?
+#2. remove tokenizer completely from here
+#3. potentially change ifs to opposite
+# shift train to main and make this its own class.
+
+
+
 
 # load clean descriptions into memory
 def load_clean_descriptions(filename, dataset):
@@ -125,14 +135,16 @@ def data_generator(descriptions, photos, max_length, vocab_size, word_to_index):
 			yield [in_img, in_seq], out_word
  
 # def train(model, train_descriptions, train_features, tokenizer, vocab_size, max_length): #maybe add batching?
-def train(model, train_descriptions, train_features, vocab_size, max_length, word_to_index): #maybe add batching?
-	steps = len(train_descriptions) # train the model, run epochs manually and save after each epoch
-	epochs = 1
-	for i in range(epochs):
-		# create the data generator
-		# generator = data_generator(train_descriptions, train_features, tokenizer, max_length, vocab_size)
-		generator = data_generator(train_descriptions, train_features, max_length, vocab_size, word_to_index)
-		# fit for one epoch
-		model.fit_generator(generator, epochs=1, steps_per_epoch=steps, verbose=1)
-		# save model
-		model.save('model_' + str(i) + '.h5')
+# def train(model, train_descriptions, train_features, vocab_size, max_length, word_to_index): 
+# 	steps = len(train_descriptions) # train the model, run epochs manually and save after each epoch
+# 	epochs = 1
+# 	for i in range(epochs):
+# 		# create the data generator
+# 		# generator = data_generator(train_descriptions, train_features, tokenizer, max_length, vocab_size)
+# 		generator = data_generator(train_descriptions, train_features, max_length, vocab_size, word_to_index)
+# 		# fit for one epoch
+# 		model.fit_generator(generator, epochs=1, steps_per_epoch=steps, verbose=1)
+# 		# save model
+# 		model.save('model_' + str(i) + '.h5')
+
+
