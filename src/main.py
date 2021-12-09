@@ -37,12 +37,14 @@ print('Vocabulary Size: %d' % vocab_size)
 
 max_length = max_length(train_descriptions)
 print('Description Length: %d' % max_length)
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 model = define_model(vocab_size, max_length) # define the model
 
 # train
 train(model, train_descriptions, train_features, tokenizer, vocab_size, max_length)
 
-
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # load test set
 filename = '../data/Flickr8k_text/Flickr_8k.testImages.txt'
 test = load_set(filename)
@@ -54,8 +56,8 @@ print('Descriptions: test=%d' % len(test_descriptions))
 test_features = load_photo_features('features.pkl', test)
 print('Photos: test=%d' % len(test_features))
  
-# load the model
-filename = '../model_0.h5'
+# # load the model
+filename = 'model_0.h5'
 model = load_model(filename)
 # evaluate model
 evaluate_model(model, test_descriptions, test_features, tokenizer, max_length)

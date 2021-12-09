@@ -10,5 +10,8 @@ source env/bin/activate
 pip install -U pip
 # this installs the required python packages to the virtual environment
 pip install -r requirements.txt
+pip install split-folders tqdm
+pip install scipy
+
 
 echo created environment
