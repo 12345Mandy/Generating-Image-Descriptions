@@ -100,7 +100,11 @@ def main():
     isSplit = os.path.isdir(path) 
     if not isSplit:
         splitfolders.fixed("vgg16-data/raw-img", output='vgg16-data-split',seed=1337, fixed=100, oversample=False, group_prefix=None) # default values
-    trdata = ImageDataGenerator()
+    trdata = ImageDataGenerator(
+        rotation_range=20,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        horizontal_flip=True)
     traindata = trdata.flow_from_directory(directory="vgg16-data-split/train",target_size=(224,224))
     tsdata = ImageDataGenerator()
     testdata = tsdata.flow_from_directory(directory="vgg16-data-split/val", target_size=(224,224))
