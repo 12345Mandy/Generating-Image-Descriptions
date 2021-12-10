@@ -7,64 +7,16 @@ from utils import *
 from constant import *
 import matplotlib.pyplot as plt
 
-# TODO: potentially shift all functions besides train, bleu and main to utils
 
-def load_descriptions_and_features(filename, train_or_test):
-    # load training dataset (6K)
-    filename = filename
-    dataset = load_set(filename)
-    print('Dataset', train_or_test, ': = %d' % len(dataset))
-    # descriptions
-    descriptions = load_clean_descriptions('descriptions.txt', dataset)
-    print('Descriptions', train_or_test, ': = %d' % len(descriptions))
-    # photo features
-    features = load_photo_features('features.pkl', dataset)
-    print('Photos', train_or_test, ': = %d' % len(features))
-    return descriptions, features
 
-def own_tokenizer(vocab):
-    indextoword = {}
-    wordtoindex = {}
-    idx = 1
-    for word in vocab:
-        wordtoindex[word] = idx
-        indextoword[idx] = word
-        idx += 1
-    return indextoword, wordtoindex
-
-# generate image description
-def generate_caption(model, photo, max_length, indextoword, wordtoindex):
-    desc = STARTSEQ
-    for _ in range(max_length):
-        # integer encode input sequence
-        seq = [wordtoindex[w] for w in desc.split() if w in wordtoindex]
-        seq = pad_sequences([seq], maxlen=max_length)
-        # predict next word
-        next_word = model.predict([photo, seq], verbose=0)
-        # convert probability to integer
-        next_word = np.argmax(next_word)
-        word = indextoword[next_word]
-        if word is None:
-            break
-        desc = desc + ' ' + word
-        if word == ENDSEQ:
-            break
-    return desc
-
-# input = result from generate_caption
-def clean_up_caption(desc):
-    desc = desc.split()[1:-1]
-    desc = ' '.join(desc)
-    return desc
 
 def train(model, train_descriptions, train_features, vocab_size, max_length, word_to_index): 
-	steps = len(train_descriptions) # train the model, run epochs manually and save after each epoch
+    ## train the model, run epochs manually and save after each epoch
+	steps = len(train_descriptions) 
 	for i in range(constant.EPOCH):
 		# create the data generator
 		generator = data_generator(train_descriptions, train_features, max_length, vocab_size, word_to_index)
-		# fit for one epoch
 		model.fit_generator(generator, epochs=constant.EPOCH, steps_per_epoch=steps, verbose=1)
-		# save model
 		model.save('model_' + str(i) + '.h5')
 
 # test the model using bleu
@@ -112,7 +64,6 @@ def main():
     lst_of_desc = list()
     for key in train_descriptions.keys():
         [lst_of_desc.append(d) for d in train_descriptions[key]]
-    #lines = to_lines(train_descriptions)
     max_description_length = max(len(d.split()) for d in lst_of_desc)
     print('Description Length: %d' % max_description_length)
 
@@ -133,8 +84,8 @@ def main():
     filename = MODEL_FILENAME
     print("loading model")
     model = load_model(filename)
-    # print("ready to test bleu")
-    # bleu(model, test_descriptions, test_features, max_description_length, index_to_word, word_to_index)
+    print("ready to test bleu")
+    bleu(model, test_descriptions, test_features, max_description_length, index_to_word, word_to_index)
 
     # OUTPUT_DIM = 4069
     for z in range(10): # set higher to see more examples

@@ -10,6 +10,7 @@ from tensorflow.python.keras.utils.np_utils import to_categorical
 from tensorflow.keras.models import load_model
 from utils import *
 import constant
+from constant import *
 
 #for all the stuff that is used in multiple files
 
@@ -31,11 +32,51 @@ def load_set(filename):
 	return set(dataset)
 
 ## was originally in train 
+ 
+def own_tokenizer(vocab):
+    indextoword = {}
+    wordtoindex = {}
+    idx = 1
+    for word in vocab:
+        wordtoindex[word] = idx
+        indextoword[idx] = word
+        idx += 1
+    return indextoword, wordtoindex
 
-# load clean descriptions into memory
-def load_clean_descriptions(filename, dataset):
-	# load document
-	doc = load_doc(filename)
+# generate image description
+def generate_caption(model, photo, max_length, indextoword, wordtoindex):
+    desc = STARTSEQ
+    for _ in range(max_length):
+        # integer encode input sequence
+        seq = [wordtoindex[w] for w in desc.split() if w in wordtoindex]
+        seq = pad_sequences([seq], maxlen=max_length)
+        # predict next word
+        next_word = model.predict([photo, seq], verbose=0)
+        # convert probability to integer
+        next_word = np.argmax(next_word)
+        word = indextoword[next_word]
+        if word is None:
+            break
+        desc = desc + ' ' + word
+        if word == ENDSEQ:
+            break
+    return desc
+
+# input = result from generate_caption
+def clean_up_caption(desc):
+    desc = desc.split()[1:-1]
+    desc = ' '.join(desc)
+    return desc
+
+# loads the previously saved photo embeddings and descriptions
+def load_descriptions_and_features(filename, train_or_test):
+	# load dataset (6K) -> this is training or test depending on parameter
+	filename = filename
+	dataset = load_set(filename)
+	print('Dataset', train_or_test, ': = %d' % len(dataset))
+	# load the clean descriptions
+	# descriptions = load_clean_descriptions('descriptions.txt', dataset)
+	doc = load_doc('descriptions.txt')
 	descriptions = dict()
 	for line in doc.split('\n'):
 		# split line by white space
@@ -51,22 +92,16 @@ def load_clean_descriptions(filename, dataset):
 			desc = 'startseq ' + ' '.join(image_desc) + ' endseq'
 			# store
 			descriptions[image_id].append(desc)
-	return descriptions
- 
-# load photo features
-def load_photo_features(filename, dataset):
+	print('Descriptions', train_or_test, ': = %d' % len(descriptions))
+	# photo features
+	#features = load_photo_features('features.pkl', dataset)
 	# load all features
-	all_features = load(open(filename, 'rb'))
+	all_features = load(open('features.pkl', 'rb'))
 	# filter features
 	features = {k: all_features[k] for k in dataset}
-	return features
- 
-# covert a dictionary of clean descriptions to a list of descriptions
-# def to_lines(descriptions):
-# 	all_desc = list()
-# 	for key in descriptions.keys():
-# 		[all_desc.append(d) for d in descriptions[key]]
-# 	return all_desc
+	print('Photos', train_or_test, ': = %d' % len(features))
+	return descriptions, features
+
  
 # create sequences of images, input sequences and output words for an image
 def create_sequences(max_length, desc_list, photo, vocab_size, word_to_index):
