@@ -11,4 +11,4 @@ Note: a pretrained vgg16 is used in the main project. An implementation of vg16 
 
 ## Final Writeup
 
-You can find the final writeup here.
+You can find the final writeup [here](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/Final_Writeup.md).

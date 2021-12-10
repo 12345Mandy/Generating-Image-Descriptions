@@ -92,3 +92,105 @@ BLEU-3: 0.187125
 BLEU-4: 0.073948
 
 These scores all generally fall into the ranges of “good” BLEU scores.
+
+###### VGG16-GRU Image Captioning Results: Quality Control
+
+Besides testing the VGG16-GRU model with BLEU scores above, we generated captions for 10 images from the Flickr dataset using our model to manually test the model for caption quality.
+
+**Images that did relatively well**
+
+`1) the man is riding rock`
+
+The model captured the correct subject (the man).
+
+The model did not capture the correct action (surfing) or environment (ocean), but we can see why the ocean waves might look like a rock.
+
+![im1|200](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/quality_control/im1.png)
+
+`2) man in red shirt is standing on the street`
+
+The model captured one subject correctly (the man), gave him the correct attribute (red shirt), and described the environment correctly (the street).
+
+The model did not capture the correct number of subjects. Future work on the model could include enhancing the model so it’s able to generate accurate descriptions for images with multiple subjects.
+
+![im6|200](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/quality_control/im6.png)
+
+**Images that did slightly less well**
+
+`1) little boy in red shirt is running on the grass`
+
+The model correctly identified the environment (grass).
+The model failed to identify the correct action (hanging/sitting – can’t tell) and the subject’s attribute (gray jacket). Since the lower half of the child’s body looks like it could be touching the grass, the model may have thought the boy was running.
+
+![im2|200](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/quality_control/im2.png)
+
+`2) man is sitting on the street`
+
+The model identified the correct subject (man).
+
+The model failed to identify the correct action (riding), but “sitting” is not entirely wrong since the man is sitting on a bike. The model also failed to identify the correct environment (forest, rocks), but it was close, since a street often includes trees, which are shown in the image. 
+
+![im3|200](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/quality_control/im3.png)
+
+`3) man in red shirt is standing on the street`
+
+The model captured the correct subject (man) and possibly environment (street).
+
+The model failed to identify the correct attribute (white shirt). Maybe the red lights in the background confused the model, making it give the man the attribute of “red shirt”.
+
+![im4|200](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/quality_control/im4.png)
+
+`4) two dogs are playing on the grass`
+
+The model identifies the correct number of subjects (two) and environment (grass).
+
+The model does not identify the correct subjects, however. We can see how the back of the horse is similar to a dog, but we are unsure how the man was identified as a dog.
+
+![im5|200](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/quality_control/im5.png)
+
+`5) two dogs are playing with ball`
+
+The model identifies the correct subject (dog) and somewhat correct action (playing).
+
+The model fails to identify the correct number of subjects (one), and no ball is present. Perhaps the majority of images of a dog jumping in the air on grass in the dataset were images of two dogs playing with a ball and the caption generator was fooled by the jumping dog in the photo.
+
+![im7|200](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/quality_control/im7.png)
+
+`6) two children are playing in the water`
+
+The model detects the correct subject (child) and action (playing).
+
+The model fails to identify the correct number of subjects (one) and environment (backyard). Perhaps the silver bar at the bottom of the image was identified as water on a beach.
+
+![im8|200](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/quality_control/im8.png)
+
+**Images that did poorly**
+
+`1) two girls are playing with ball`
+
+The model identifies the wrong subject, number of subjects, and action. We are unsure how this happened. Future work would include investigating how to improve the model to decrease the number of these mistakes.
+
+![im9|200](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/quality_control/im9.png)
+
+`2) man in red shirt is standing on the beach`
+
+The model identifies the wrong gender, number of subjects, action, and environment. Perhaps the model thought the red pillar was a man in a red shirt standing.
+
+![im10|200](https://github.com/12345Mandy/Generating-Image-Descriptions/blob/main/quality_control/im10.png)
+
+#### Reflection
+We were able to meet our target goals for this project. Our final algorithm was able to recognize the primary objects and their modifiers in the images in our dataset and match them to the correct labels, which served as the captions of the images. We expected to also generate captions using an n-gram as part of our model, but this ended up increasing the complexity of our project more than we thought it would, and we did not have time to include this in our implementation. We made several pivotal changes to our goals while working on the project. Our initial goals were more closely aligned with the original paper we sought to implement, but these goals were not as feasible as we initially thought they would be. We then chose to implement an architecture more similar to that shown in our related work section. 
+
+We briefly shifted our target goal to be converting the code given in the related work section to PyTorch, as it was originally written in Tensorflow. However, we decided not to do that and rather to focus on experimenting with different image classification models to see how these different models would affect our results. 
+We drew from various sources and experimented with VGG16 implementations and the Inceptionv3 model to see how we could alter and potentially improve our results. We also successfully improved the efficiency of our model by experimenting with GRUs and stacked LSTMS in the caption generator. 
+
+If we could do our project over again, we would set more realistic goals from the beginning and do more research into the models and architecture necessary at the beginning of our project. This would have saved us a lot of time. If we had more time, we would like to potentially improve the accuracy of our captions generated. One way we could potentially improve accuracy is to use a set of pre-trained NLP vectors for common words rather than have our model learn the word vectors while fitting the model. We could improve accuracy by training on a larger dataset or by refining our vocabulary. We could also try using a different image feature extractor or a CNN model like the Inceptionv3 Model which could potentially garner better results for reasons we mentioned earlier in Methodology.
+
+#### Sources
+- Tamara L Berg et al. "Baby Talk: Understanding and Generating Image Descriptions". [Paper we originally hoped to implement](http://tamaraberg.com/papers/generation_cvpr11.pdf)
+- Jason Brownlee. "How to Develop a Deep Learning Photo Caption Generator from Scratch". [Related Work Link](https://machinelearningmastery.com/develop-a-deep-learning-caption-generation-model-in-python/)
+- Andrej Karpathy. "Connecting Images and Natural Language". [Stanford Paper Link](https://cs.stanford.edu/people/karpathy/main.pdf)
+- Nuerohive. "VGG16 – Convolutional Network for Classification and Detection". [Link](https://neurohive.io/en/popular-networks/vgg16/)
+- Jason Brownlee. "Caption Generation with the Inject and Merge Encoder-Decoder Models". [Link](https://machinelearningmastery.com/caption-generation-inject-merge-architectures-encoder-decoder-model/)
+- Jeff Heaton. "Image Captioning with Keras and TensorFlow (10.4)". [Video](https://www.youtube.com/watch?v=NmoW_AYWkb4)
+- Sejal Dua. "Do it for the ‘gram: Instagram-style Caption Generator". [Link](https://towardsdatascience.com/do-it-for-the-gram-instagram-style-caption-generator-4e7044766e34)
