@@ -64,9 +64,9 @@ We used BLEU scores to determine the success of our models. We tested our models
 *Criteria*
 
 **Ranges of “good” BLEU scores at each stage:**
-BLEU-1: 0.401 to 0.578
-BLEU-2: 0.176 to 0.390
-BLEU-3: 0.099 to 0.260
+BLEU-1: 0.401 to 0.578<br>
+BLEU-2: 0.176 to 0.390<br>
+BLEU-3: 0.099 to 0.260<br>
 BLEU-4: 0.059 to 0.170
 
 *Our Testing Results*
@@ -74,21 +74,21 @@ BLEU-4: 0.059 to 0.170
 The following scores use the pre-implemented VGG16 model and various caption generators.
 
 **Scores for VGG16-LSTM**
-BLEU-1: 0.518058
-BLEU-2: 0.280059
-BLEU-3: 0.186328
+BLEU-1: 0.518058<br>
+BLEU-2: 0.280059<br>
+BLEU-3: 0.186328<br>
 BLEU-4: 0.082154
 
 **Scores for VGG16-GRU**
-BLEU-1: 0.555404
-BLEU-2: 0.297118
-BLEU-3: 0.200846
+BLEU-1: 0.555404<br>
+BLEU-2: 0.297118<br>
+BLEU-3: 0.200846<br>
 BLEU-4: 0.092077
 
 **Scores for VGG16-LSTM-LSTM**
-BLEU-1: 0.556409
-BLEU-2: 0.296571
-BLEU-3: 0.187125
+BLEU-1: 0.556409<br>
+BLEU-2: 0.296571<br>
+BLEU-3: 0.187125<br>
 BLEU-4: 0.073948
 
 These scores all generally fall into the ranges of “good” BLEU scores.
