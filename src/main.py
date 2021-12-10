@@ -109,16 +109,20 @@ def main():
     index_to_word, word_to_index = own_tokenizer(vocab)
     vocab_size = len(index_to_word) + 1
     print('Vocabulary Size: %d' % vocab_size)
-    lines = to_lines(train_descriptions)
-    max_description_length = max(len(d.split()) for d in lines)
+    lst_of_desc = list()
+    for key in train_descriptions.keys():
+        [lst_of_desc.append(d) for d in train_descriptions[key]]
+    #lines = to_lines(train_descriptions)
+    max_description_length = max(len(d.split()) for d in lst_of_desc)
     print('Description Length: %d' % max_description_length)
 
+
     ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # define the model-> TIP: this is our caption generator with the lstm stuff
+    #define the model-> this is our caption generator. 
     
-    # model = Caption_Gen(vocab_size, max_description_length)
-    # model = model.get_model_GRU()
-    # train(model, train_descriptions, train_features, vocab_size, max_description_length, word_to_index)
+    model = Caption_Gen(vocab_size, max_description_length)
+    model = model.get_model_GRU() ## can be replaceed with the other get_models on caption_gen_models
+    train(model, train_descriptions, train_features, vocab_size, max_description_length, word_to_index)
 
     ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # test

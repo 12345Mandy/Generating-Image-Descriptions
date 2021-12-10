@@ -62,11 +62,11 @@ def load_photo_features(filename, dataset):
 	return features
  
 # covert a dictionary of clean descriptions to a list of descriptions
-def to_lines(descriptions):
-	all_desc = list()
-	for key in descriptions.keys():
-		[all_desc.append(d) for d in descriptions[key]]
-	return all_desc
+# def to_lines(descriptions):
+# 	all_desc = list()
+# 	for key in descriptions.keys():
+# 		[all_desc.append(d) for d in descriptions[key]]
+# 	return all_desc
  
 # create sequences of images, input sequences and output words for an image
 def create_sequences(max_length, desc_list, photo, vocab_size, word_to_index):
