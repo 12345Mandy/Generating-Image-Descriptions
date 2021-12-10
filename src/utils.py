@@ -12,26 +12,8 @@ from utils import *
 import constant
 from constant import *
 
-#for all the stuff that is used in multiple files
 
-# load doc into memory
-def load_doc(filename):
-	file = open(filename, 'r')
-	text = file.read()
-	file.close()
-	return text
 
-def load_set(filename):
-	doc = load_doc(filename)
-	dataset = list()
-	for line in doc.split('\n'):
-		if len(line) < 1:
-			continue
-		identifier = line.split('.')[0]
-		dataset.append(identifier)
-	return set(dataset)
-
-## was originally in train 
  
 def own_tokenizer(vocab):
     indextoword = {}
@@ -74,18 +56,14 @@ def load_descriptions_and_features(filename, train_or_test):
 	filename = filename
 	dataset = load_set(filename)
 	print('Dataset', train_or_test, ': = %d' % len(dataset))
-	# load the clean descriptions
-	# descriptions = load_clean_descriptions('descriptions.txt', dataset)
+	# get the clean descriptions from descriptions.txt
 	doc = load_doc('descriptions.txt')
 	descriptions = dict()
 	for line in doc.split('\n'):
-		# split line by white space
 		tokens = line.split()
-		# split id from description
 		image_id, image_desc = tokens[0], tokens[1:]
-		# skip images not in the set
+		# Only use images in the set
 		if image_id in dataset:
-			# create list
 			if image_id not in descriptions:
 				descriptions[image_id] = list()
 			# wrap description in tokens
@@ -93,18 +71,35 @@ def load_descriptions_and_features(filename, train_or_test):
 			# store
 			descriptions[image_id].append(desc)
 	print('Descriptions', train_or_test, ': = %d' % len(descriptions))
-	# photo features
-	#features = load_photo_features('features.pkl', dataset)
-	# load all features
+	# photo features->load all photo features
 	all_features = load(open('features.pkl', 'rb'))
 	# filter features
 	features = {k: all_features[k] for k in dataset}
 	print('Photos', train_or_test, ': = %d' % len(features))
 	return descriptions, features
 
- 
+
+
+ # load doc into memory
+def load_doc(filename):
+	file = open(filename, 'r')
+	text = file.read()
+	file.close()
+	return text
+
+def load_set(filename):
+	doc = load_doc(filename)
+	dataset = list()
+	for line in doc.split('\n'):
+		if len(line) < 1:
+			continue
+		identifier = line.split('.')[0]
+		dataset.append(identifier)
+	return set(dataset)
+
+
 # create sequences of images, input sequences and output words for an image
-def create_sequences(max_length, desc_list, photo, vocab_size, word_to_index):
+def create_input_sequences(max_length, desc_list, photo, vocab_size, word_to_index):
 	X1, X2, y = list(), list(), list()
 	# walk through each description for the image
 	for desc in desc_list:
@@ -127,7 +122,6 @@ def create_sequences(max_length, desc_list, photo, vocab_size, word_to_index):
 def data_generator(descriptions, photos, max_length, vocab_size, word_to_index):
 	while 1:
 		for key, desc_list in descriptions.items():
-			# retrieve the photo feature
 			photo = photos[key][0]
-			in_img, in_seq, out_word = create_sequences(max_length, desc_list, photo, vocab_size, word_to_index)
+			in_img, in_seq, out_word = create_input_sequences(max_length, desc_list, photo, vocab_size, word_to_index)
 			yield [in_img, in_seq], out_word

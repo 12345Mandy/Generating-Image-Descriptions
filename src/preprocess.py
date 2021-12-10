@@ -10,51 +10,11 @@ from utils import load_doc
 from constant import *
  
 
- 
-# # extract descriptions for images
-# def load_descriptions(doc): 
-# 	mapping = dict()
-# 	# process lines
-# 	for line in doc.split('\n'):
-# 		# split line by white space
-# 		tokens = line.split()
-# 		if len(line) < 2:
-# 			continue
-# 		# take the first token as the image id, the rest as the description
-# 		image_id, image_desc = tokens[0], tokens[1:]
-# 		# remove filename from image id
-# 		image_id = image_id.split('.')[0]
-# 		# convert description tokens back to string
-# 		image_desc = ' '.join(image_desc)
-# 		# create the list if needed
-# 		if image_id not in mapping:
-# 			mapping[image_id] = list()
-# 		# store description
-# 		mapping[image_id].append(image_desc)
-# 	return mapping
- 
-# def clean_descriptions(descriptions):
-# 	# prepare translation table for removing punctuation
-# 	table = str.maketrans('', '', string.punctuation)
-# 	for key, desc_list in descriptions.items():
-# 		for i in range(len(desc_list)):
-# 			desc = desc_list[i]
-# 			# tokenize
-# 			desc = desc.split()
-# 			# convert to lower case
-# 			desc = [word.lower() for word in desc]
-# 			# remove punctuation from each token
-# 			desc = [w.translate(table) for w in desc]
-# 			# remove hanging 's' and 'a'
-# 			desc = [word for word in desc if len(word)>1]
-# 			# remove tokens with numbers in them
-# 			desc = [word for word in desc if word.isalpha()]
-# 			# store as string
-# 			desc_list[i] =  ' '.join(desc)
+
 
 def create_clean_descriptions_map(unclean_desc_doc):
 	id_desc_map = dict()
-	# prepare translation table for removing punctuation
+	# translation table for removing punctuation
 	table = str.maketrans('', '', string.punctuation)
 	# process lines
 	for line in unclean_desc_doc.split('\n'):
@@ -121,26 +81,7 @@ def extract_photo_features(directory): #this needs to stay
 	return features
 
  
-# convert the loaded descriptions into a vocabulary of words
-# def to_vocabulary(descriptions):
-# 	# build a list of all description strings
-# 	all_desc = set()
-# 	for key in descriptions.keys():
-# 		[all_desc.update(d.split()) for d in descriptions[key]]
-# 	return all_desc
- 
 
- ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~new functions~~~~~~~~~~~~~~~~~~
-# save descriptions to file, one per line
-# def save_descriptions(descriptions, filename):
-# 	lines = list()
-# 	for key, desc_list in descriptions.items():
-# 		for desc in desc_list:
-# 			lines.append(key + ' ' + desc)
-# 	data = '\n'.join(lines)
-# 	file = open(filename, 'w')
-# 	file.write(data)
-# 	file.close()
 
 
 def save_photo_features():
@@ -156,21 +97,14 @@ def save_clean_descriptions():
 	file = DESCRIPTIONS_UNCLEAN_FILENAME #these are like the labels, pregenerated captions
 	# load descriptions
 	doc = load_doc(file)
-	# parse descriptions
-	# descriptions = load_descriptions(doc)
-	# print('Loaded: %d ' % len(descriptions))
-	# # clean descriptions
-	# clean_descriptions(descriptions)
 	#load descriptions and  clean descriptions
 	descriptions = create_clean_descriptions_map(doc)
 	print('Loaded: %d ' % len(descriptions))
-	# summarize vocabulary
-	#vocabulary = to_vocabulary(descriptions)
+	# summarize vocabulary and save description mapping to descriptions.txt
 	all_desc_vocab = set()
 	for key in descriptions.keys():
 		[all_desc_vocab.update(d.split()) for d in descriptions[key]]
 	print('Vocabulary Size: %d' % len(all_desc_vocab))
-	# save to file
 	lines = list()
 	for key, desc_list in descriptions.items():
 		for desc in desc_list:
@@ -192,8 +126,8 @@ def preprocess_load_all():
     
     :return: None
     '''
-	photo_features_path = 'features.pkl'   # assuming u are running src
-	descriptions_path = 'descriptions.txt'   # assuming u are running src
+	photo_features_path = 'features.pkl'   # assuming u are running from src
+	descriptions_path = 'descriptions.txt'   # assuming u are running from src
 	isFeatureExtracted = os.path.exists(photo_features_path)
 	existsDescriptions = os.path.exists(descriptions_path)
 	if not isFeatureExtracted:
